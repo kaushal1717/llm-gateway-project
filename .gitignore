@@ -13,12 +13,18 @@ override.tf.json
 .terraformrc
 terraform.rc
 .terraform.lock.hcl
+tfplan
 
 # Secrets
 *.pem
 *.key
 .env
 .env.*
+!.env.example
+
+# Postman (environments with secrets)
+*_Dev.postman_environment.json
+!*_Template.postman_environment.json
 
 # OS
 .DS_Store

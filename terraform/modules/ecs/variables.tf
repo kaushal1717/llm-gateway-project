@@ -92,6 +92,12 @@ variable "container_secrets" {
   default = []
 }
 
+variable "litellm_config_yaml_arn" {
+  description = "ARN of the LiteLLM config YAML secret in Secrets Manager"
+  type        = string
+  default     = ""
+}
+
 variable "tags" {
   description = "Tags to apply to all resources"
   type        = map(string)

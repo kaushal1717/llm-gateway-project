@@ -20,6 +20,6 @@ output "database_name" {
 
 output "connection_string" {
   description = "PostgreSQL connection string for LiteLLM"
-  value       = "postgresql://${var.database_username}:${var.database_password}@${aws_db_instance.main.endpoint}/${aws_db_instance.main.db_name}"
+  value       = "postgresql://${var.database_username}:${urlencode(var.database_password)}@${aws_db_instance.main.address}:${aws_db_instance.main.port}/${aws_db_instance.main.db_name}"
   sensitive   = true
 }

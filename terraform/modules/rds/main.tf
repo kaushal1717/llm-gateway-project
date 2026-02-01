@@ -14,12 +14,12 @@ resource "aws_db_instance" "main" {
   identifier = "${var.name}-postgres"
 
   # Engine configuration
-  engine               = "postgres"
-  engine_version       = var.engine_version
-  instance_class       = var.instance_class
-  allocated_storage    = var.allocated_storage
-  storage_type         = "gp3"
-  storage_encrypted    = true
+  engine            = "postgres"
+  engine_version    = var.engine_version
+  instance_class    = var.instance_class
+  allocated_storage = var.allocated_storage
+  storage_type      = "gp3"
+  storage_encrypted = true
 
   # Database configuration
   db_name  = var.database_name
@@ -39,12 +39,12 @@ resource "aws_db_instance" "main" {
   maintenance_window      = "Mon:04:00-Mon:05:00"
 
   # MVP settings
-  skip_final_snapshot       = true # For MVP only - change in production
-  deletion_protection       = false # For MVP only - enable in production
+  skip_final_snapshot        = true  # For MVP only - change in production
+  deletion_protection        = false # For MVP only - enable in production
   auto_minor_version_upgrade = true
 
   # Performance Insights (free tier available)
-  performance_insights_enabled = true
+  performance_insights_enabled          = true
   performance_insights_retention_period = 7
 
   # Parameter group for connection limits
@@ -63,13 +63,9 @@ resource "aws_db_parameter_group" "main" {
 
   # Optimize for db.t4g.micro limited resources
   parameter {
-    name  = "max_connections"
-    value = "80" # Conservative limit for t4g.micro
-  }
-
-  parameter {
-    name  = "shared_buffers"
-    value = "{DBInstanceClassMemory/32768}" # ~128MB for 1GB instance
+    name         = "max_connections"
+    value        = "80" # Conservative limit for t4g.micro
+    apply_method = "pending-reboot"
   }
 
   tags = merge(var.tags, {

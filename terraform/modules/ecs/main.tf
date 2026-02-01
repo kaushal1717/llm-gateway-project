@@ -114,14 +114,23 @@ resource "aws_iam_role_policy" "ecs_bedrock" {
           "bedrock:InvokeModelWithResponseStream"
         ]
         Resource = [
+          # Foundation models
           "arn:aws:bedrock:*::foundation-model/anthropic.*",
+          "arn:aws:bedrock:*::foundation-model/amazon.*",
           "arn:aws:bedrock:*::foundation-model/us.anthropic.*",
-          "arn:aws:bedrock:*::foundation-model/us.deepseek.*"
+          "arn:aws:bedrock:*::foundation-model/us.deepseek.*",
+          # Cross-region inference profiles (APAC)
+          "arn:aws:bedrock:*:${data.aws_caller_identity.current.account_id}:inference-profile/apac.*",
+          # US inference profiles (if needed later)
+          "arn:aws:bedrock:*:${data.aws_caller_identity.current.account_id}:inference-profile/us.*"
         ]
       }
     ]
   })
 }
+
+# Data source for AWS account ID
+data "aws_caller_identity" "current" {}
 
 # ECS Task Definition
 resource "aws_ecs_task_definition" "main" {
@@ -162,6 +171,22 @@ resource "aws_ecs_task_definition" "main" {
         {
           name  = "AWS_REGION_NAME"
           value = var.aws_region
+        },
+        {
+          name  = "AWS_DEFAULT_REGION"
+          value = var.aws_region
+        },
+        {
+          name  = "LITELLM_LOG"
+          value = "DEBUG"
+        },
+        {
+          name  = "STORE_MODEL_IN_DB"
+          value = "True"
+        },
+        {
+          name  = "LITELLM_MODE"
+          value = "PRODUCTION"
         }
       ]
 
@@ -201,7 +226,6 @@ resource "aws_ecs_service" "main" {
   desired_count                      = var.desired_count
   deployment_minimum_healthy_percent = 50
   deployment_maximum_percent         = 200
-  launch_type                        = "FARGATE"
   platform_version                   = "LATEST"
   health_check_grace_period_seconds  = 60
 
@@ -217,6 +241,7 @@ resource "aws_ecs_service" "main" {
     container_port   = var.container_port
   }
 
+  # Use FARGATE_SPOT for cost savings (removed launch_type to use capacity_provider_strategy)
   capacity_provider_strategy {
     capacity_provider = "FARGATE_SPOT"
     weight            = 1

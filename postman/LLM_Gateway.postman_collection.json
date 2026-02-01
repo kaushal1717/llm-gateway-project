@@ -1,0 +1,657 @@
+{
+  "info": {
+    "_postman_id": "llm-gateway-collection",
+    "name": "LLM Gateway API",
+    "description": "Enterprise LLM Gateway API collection for managing models, teams, users, and chat completions via LiteLLM proxy to AWS Bedrock.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "{{LITELLM_URL}}"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{API_KEY}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Health & Info",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            },
+            "description": "Check the health status of all configured models"
+          }
+        },
+        {
+          "name": "List Models",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/models",
+              "host": ["{{base_url}}"],
+              "path": ["models"]
+            },
+            "description": "List all available models (OpenAI-compatible endpoint)"
+          }
+        },
+        {
+          "name": "Model Info (Detailed)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/model/info",
+              "host": ["{{base_url}}"],
+              "path": ["model", "info"]
+            },
+            "description": "Get detailed information about all models including pricing and capabilities"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Chat Completions",
+      "item": [
+        {
+          "name": "Chat - model-cheap (Nova Micro)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"model-cheap\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Hello! Say hi back in one word.\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/chat/completions",
+              "host": ["{{base_url}}"],
+              "path": ["chat", "completions"]
+            },
+            "description": "Chat completion using model-cheap (Amazon Nova Micro) - Drafting tier"
+          }
+        },
+        {
+          "name": "Chat - model-balanced (Nova Lite)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"model-balanced\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Write a simple Python function to add two numbers.\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/chat/completions",
+              "host": ["{{base_url}}"],
+              "path": ["chat", "completions"]
+            },
+            "description": "Chat completion using model-balanced (Amazon Nova Lite) - Coding tier"
+          }
+        },
+        {
+          "name": "Chat - model-reasoning (Nova Pro)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"model-reasoning\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Design a microservices architecture for an e-commerce platform. Include the main services and their interactions.\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/chat/completions",
+              "host": ["{{base_url}}"],
+              "path": ["chat", "completions"]
+            },
+            "description": "Chat completion using model-reasoning (Amazon Nova Pro) - Architect tier"
+          }
+        },
+        {
+          "name": "Chat - With System Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"model-cheap\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a helpful assistant that responds concisely.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"What is the capital of France?\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/chat/completions",
+              "host": ["{{base_url}}"],
+              "path": ["chat", "completions"]
+            },
+            "description": "Chat completion with system message"
+          }
+        },
+        {
+          "name": "Chat - Streaming",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"model-cheap\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Tell me a short story about a robot.\"\n    }\n  ],\n  \"stream\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/chat/completions",
+              "host": ["{{base_url}}"],
+              "path": ["chat", "completions"]
+            },
+            "description": "Chat completion with streaming enabled"
+          }
+        },
+        {
+          "name": "Chat - With Max Tokens",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"model-cheap\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Write a poem about coding.\"\n    }\n  ],\n  \"max_tokens\": 100,\n  \"temperature\": 0.7\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/chat/completions",
+              "host": ["{{base_url}}"],
+              "path": ["chat", "completions"]
+            },
+            "description": "Chat completion with max_tokens and temperature parameters"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Model Management (Admin)",
+      "item": [
+        {
+          "name": "Add Model",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{MASTER_KEY}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model_name\": \"model-cheap\",\n  \"litellm_params\": {\n    \"model\": \"bedrock/converse/us.amazon.nova-micro-v1:0\",\n    \"aws_region_name\": \"us-east-1\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/model/new",
+              "host": ["{{base_url}}"],
+              "path": ["model", "new"]
+            },
+            "description": "Add a new model to the gateway (Admin only)"
+          }
+        },
+        {
+          "name": "Delete Model",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{MASTER_KEY}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"model-id-here\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/model/delete",
+              "host": ["{{base_url}}"],
+              "path": ["model", "delete"]
+            },
+            "description": "Delete a model from the gateway (Admin only)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Team Management (Admin)",
+      "item": [
+        {
+          "name": "List Teams",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{MASTER_KEY}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/team/list",
+              "host": ["{{base_url}}"],
+              "path": ["team", "list"]
+            },
+            "description": "List all teams"
+          }
+        },
+        {
+          "name": "Create Team - Drafting",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{MASTER_KEY}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"team_alias\": \"drafting\",\n  \"models\": [\"model-cheap\"],\n  \"max_budget\": 0.5,\n  \"rpm_limit\": 2,\n  \"budget_duration\": \"1mo\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/team/new",
+              "host": ["{{base_url}}"],
+              "path": ["team", "new"]
+            },
+            "description": "Create Drafting tier team"
+          }
+        },
+        {
+          "name": "Create Team - Coding",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{MASTER_KEY}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"team_alias\": \"coding\",\n  \"models\": [\"model-balanced\"],\n  \"max_budget\": 1.0,\n  \"rpm_limit\": 3,\n  \"budget_duration\": \"1mo\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/team/new",
+              "host": ["{{base_url}}"],
+              "path": ["team", "new"]
+            },
+            "description": "Create Coding tier team"
+          }
+        },
+        {
+          "name": "Create Team - Architect",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{MASTER_KEY}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"team_alias\": \"architect\",\n  \"models\": [\"model-reasoning\"],\n  \"max_budget\": 2.0,\n  \"rpm_limit\": 5,\n  \"budget_duration\": \"1mo\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/team/new",
+              "host": ["{{base_url}}"],
+              "path": ["team", "new"]
+            },
+            "description": "Create Architect tier team"
+          }
+        },
+        {
+          "name": "Delete Team",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{MASTER_KEY}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"team_ids\": [\"team-id-here\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/team/delete",
+              "host": ["{{base_url}}"],
+              "path": ["team", "delete"]
+            },
+            "description": "Delete a team"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Key Management (Admin)",
+      "item": [
+        {
+          "name": "List Keys",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{MASTER_KEY}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/key/list",
+              "host": ["{{base_url}}"],
+              "path": ["key", "list"]
+            },
+            "description": "List all API keys"
+          }
+        },
+        {
+          "name": "Generate Key",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{MASTER_KEY}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"user@example.com\",\n  \"team_id\": \"team-uuid-here\",\n  \"key_alias\": \"User Name\",\n  \"rpm_limit\": 2,\n  \"max_budget\": 0.5,\n  \"models\": [\"model-cheap\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/key/generate",
+              "host": ["{{base_url}}"],
+              "path": ["key", "generate"]
+            },
+            "description": "Generate a new API key for a user"
+          }
+        },
+        {
+          "name": "Key Info",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{MASTER_KEY}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/key/info",
+              "host": ["{{base_url}}"],
+              "path": ["key", "info"]
+            },
+            "description": "Get information about all keys"
+          }
+        },
+        {
+          "name": "Delete Key",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{MASTER_KEY}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"keys\": [\"sk-key-to-delete\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/key/delete",
+              "host": ["{{base_url}}"],
+              "path": ["key", "delete"]
+            },
+            "description": "Delete API keys"
+          }
+        }
+      ]
+    },
+    {
+      "name": "User & Spend (Admin)",
+      "item": [
+        {
+          "name": "User Info",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{MASTER_KEY}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_ids\": [\"user@example.com\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/user/info",
+              "host": ["{{base_url}}"],
+              "path": ["user", "info"]
+            },
+            "description": "Get user information and spend"
+          }
+        },
+        {
+          "name": "Global Spend",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{MASTER_KEY}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/global/spend",
+              "host": ["{{base_url}}"],
+              "path": ["global", "spend"]
+            },
+            "description": "Get global spend across all users"
+          }
+        },
+        {
+          "name": "Spend Logs",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{MASTER_KEY}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/spend/logs",
+              "host": ["{{base_url}}"],
+              "path": ["spend", "logs"]
+            },
+            "description": "Get spend logs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rate Limit Testing",
+      "item": [
+        {
+          "name": "Rate Limit Test (Run Multiple Times)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"model-cheap\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"Hi\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/chat/completions",
+              "host": ["{{base_url}}"],
+              "path": ["chat", "completions"]
+            },
+            "description": "Run this request multiple times quickly to test rate limiting. With rpm_limit=2, the 3rd request within a minute should fail."
+          }
+        }
+      ]
+    }
+  ]
+}

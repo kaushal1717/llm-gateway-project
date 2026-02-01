@@ -39,6 +39,12 @@ output "secrets_arns" {
   description = "List of all secret ARNs for IAM policies"
   value = [
     aws_secretsmanager_secret.db_credentials.arn,
-    aws_secretsmanager_secret.litellm_config.arn
+    aws_secretsmanager_secret.litellm_config.arn,
+    aws_secretsmanager_secret.litellm_config_yaml.arn
   ]
+}
+
+output "litellm_config_yaml_arn" {
+  description = "ARN of the LiteLLM config YAML secret"
+  value       = aws_secretsmanager_secret.litellm_config_yaml.arn
 }

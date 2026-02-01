@@ -1,0 +1,84 @@
+# =============================================================================
+# User Governance Tiers Configuration
+# =============================================================================
+# This file defines the user tiers for the LLM Gateway.
+# Modify this file to add, remove, or update tiers dynamically.
+#
+# Each tier has:
+#   - name: Display name for the tier
+#   - budget_monthly: Maximum spend per month in USD
+#   - rpm_limit: Requests per minute limit
+#   - allowed_models: List of model aliases this tier can access
+#   - description: Human-readable description
+#
+# Available models (defined in config/litellm_config.yaml):
+#   - model-cheap: Claude Haiku (fast, low cost)
+#   - model-balanced: Claude Sonnet (balanced performance)
+#   - model-reasoning: DeepSeek R1 (advanced reasoning)
+#   - model-reasoning-opus: Claude Opus (premium reasoning)
+# =============================================================================
+
+tiers:
+  # Entry-level tier for basic tasks
+  drafting:
+    name: "Drafting"
+    budget_monthly: 0.50
+    rpm_limit: 2
+    allowed_models:
+      - model-cheap
+    description: "Budget-friendly tier for simple drafting tasks"
+
+  # Mid-tier for development work
+  coding:
+    name: "Coding"
+    budget_monthly: 1.00
+    rpm_limit: 3
+    allowed_models:
+      - model-balanced
+    description: "Balanced tier for coding assistance"
+
+  # Premium tier for complex work
+  architect:
+    name: "Architect"
+    budget_monthly: 2.00
+    rpm_limit: 5
+    allowed_models:
+      - model-reasoning
+      - model-reasoning-opus
+    description: "Premium tier for architectural decisions and complex reasoning"
+
+# =============================================================================
+# EXAMPLES: How to add custom tiers
+# =============================================================================
+#
+# Example 1: Add a "Power User" tier
+#   power_user:
+#     name: "Power User"
+#     budget_monthly: 100.00
+#     rpm_limit: 75
+#     allowed_models:
+#       - model-balanced
+#       - model-reasoning
+#     description: "Enhanced tier for power users"
+#
+# Example 2: Add a "Free Trial" tier
+#   free_trial:
+#     name: "Free Trial"
+#     budget_monthly: 1.00
+#     rpm_limit: 5
+#     allowed_models:
+#       - model-cheap
+#     description: "Limited trial tier for new users"
+#
+# Example 3: Add an "Enterprise" tier
+#   enterprise:
+#     name: "Enterprise"
+#     budget_monthly: 2000.00
+#     rpm_limit: 200
+#     allowed_models:
+#       - model-cheap
+#       - model-balanced
+#       - model-reasoning
+#       - model-reasoning-opus
+#     description: "Unlimited access for enterprise customers"
+# =============================================================================

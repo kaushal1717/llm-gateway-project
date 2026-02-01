@@ -47,3 +47,19 @@ resource "aws_secretsmanager_secret_version" "litellm_config" {
     master_key = "sk-${random_password.litellm_master_key.result}"
   })
 }
+
+# Secret for LiteLLM config.yaml content
+resource "aws_secretsmanager_secret" "litellm_config_yaml" {
+  name                    = "${var.name}/litellm-config-yaml"
+  description             = "LiteLLM proxy configuration YAML"
+  recovery_window_in_days = 0 # For MVP - set to 7+ in production
+
+  tags = merge(var.tags, {
+    Name = "${var.name}-litellm-config-yaml"
+  })
+}
+
+resource "aws_secretsmanager_secret_version" "litellm_config_yaml" {
+  secret_id     = aws_secretsmanager_secret.litellm_config_yaml.id
+  secret_string = var.litellm_config_yaml
+}

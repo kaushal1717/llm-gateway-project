@@ -48,21 +48,22 @@ locals {
 module "secrets" {
   source = "../../modules/secrets"
 
-  name        = local.name
-  db_username = var.db_username
-  tags        = local.common_tags
+  name                = local.name
+  db_username         = var.db_username
+  litellm_config_yaml = file("${path.module}/../../../config/litellm_config.yaml")
+  tags                = local.common_tags
 }
 
 # VPC Module
 module "vpc" {
   source = "../../modules/vpc"
 
-  name               = local.name
-  vpc_cidr           = var.vpc_cidr
-  availability_zones = var.availability_zones
+  name                 = local.name
+  vpc_cidr             = var.vpc_cidr
+  availability_zones   = var.availability_zones
   private_subnet_cidrs = var.private_subnet_cidrs
   public_subnet_cidrs  = var.public_subnet_cidrs
-  tags               = local.common_tags
+  tags                 = local.common_tags
 }
 
 # Security Groups Module
@@ -79,16 +80,16 @@ module "security_groups" {
 module "rds" {
   source = "../../modules/rds"
 
-  name              = local.name
+  name               = local.name
   private_subnet_ids = module.vpc.private_subnet_ids
   security_group_id  = module.security_groups.rds_security_group_id
 
-  instance_class     = var.db_instance_class
-  allocated_storage  = var.db_allocated_storage
-  engine_version     = var.db_engine_version
-  database_name      = var.db_name
-  database_username  = module.secrets.db_username
-  database_password  = module.secrets.db_password
+  instance_class    = var.db_instance_class
+  allocated_storage = var.db_allocated_storage
+  engine_version    = var.db_engine_version
+  database_name     = var.db_name
+  database_username = module.secrets.db_username
+  database_password = module.secrets.db_password
 
   tags = local.common_tags
 }
@@ -116,17 +117,18 @@ module "ecs" {
   ecs_security_group_id = module.security_groups.ecs_security_group_id
   target_group_arn      = module.alb.target_group_arn
 
-  container_image    = var.container_image
-  container_port     = var.container_port
-  task_cpu           = var.task_cpu
-  task_memory        = var.task_memory
-  desired_count      = var.desired_count
-  min_capacity       = var.min_capacity
-  max_capacity       = var.max_capacity
+  container_image = var.container_image
+  container_port  = var.container_port
+  task_cpu        = var.task_cpu
+  task_memory     = var.task_memory
+  desired_count   = var.desired_count
+  min_capacity    = var.min_capacity
+  max_capacity    = var.max_capacity
 
-  database_url       = module.rds.connection_string
-  litellm_master_key = module.secrets.litellm_master_key
-  secrets_arns       = module.secrets.secrets_arns
+  database_url            = module.rds.connection_string
+  litellm_master_key      = module.secrets.litellm_master_key
+  secrets_arns            = module.secrets.secrets_arns
+  litellm_config_yaml_arn = module.secrets.litellm_config_yaml_arn
 
   tags = local.common_tags
 }

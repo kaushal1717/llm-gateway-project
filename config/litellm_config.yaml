@@ -1,0 +1,104 @@
+# LiteLLM Proxy Configuration
+# Enterprise LLM Gateway - AWS Bedrock Provider
+# Reference: CLAUDE.md Sections 4, 5
+
+# =============================================================================
+# MODEL DEFINITIONS
+# Map logical aliases to physical AWS Bedrock model IDs (ap-south-1)
+# =============================================================================
+model_list:
+  # Tier: Drafting - Budget-friendly model for simple tasks
+  - model_name: model-cheap
+    litellm_params:
+      model: bedrock/anthropic.claude-4-5-haiku-20241022-v1:0
+      aws_region_name: ap-south-1
+
+  # Tier: Coding - Balanced performance model
+  - model_name: model-balanced
+    litellm_params:
+      model: bedrock/anthropic.claude-4-5-sonnet-20241022-v2:0
+      aws_region_name: ap-south-1
+
+  # Tier: Architect - Advanced reasoning model (DeepSeek R1)
+  - model_name: model-reasoning
+    litellm_params:
+      model: bedrock/deepseek.r1-v1:0
+      aws_region_name: ap-south-1
+
+  # Tier: Architect - Fallback reasoning model (Claude Opus)
+  - model_name: model-reasoning-opus
+    litellm_params:
+      model: bedrock/anthropic.claude-opus-4-5-20251101-v1:0
+      aws_region_name: ap-south-1
+
+# =============================================================================
+# GENERAL SETTINGS
+# CRITICAL: database_connection_pool_limit must be 5 for db.t4g.micro
+# =============================================================================
+general_settings:
+  # CRITICAL CONSTRAINT 5.1: Limit DB connections to prevent overwhelming
+  # the db.t4g.micro instance (~80 max connections)
+  database_connection_pool_limit: 5
+
+  # Master key is injected via environment variable
+  master_key: os.environ/LITELLM_MASTER_KEY
+
+  # Database URL is injected via environment variable
+  database_url: os.environ/DATABASE_URL
+
+  # Enable virtual key management for user governance tiers
+  enable_jwt_auth: false
+
+  # Disable public model access - require virtual keys
+  allow_requests_on_failure: false
+
+# =============================================================================
+# LITELLM SETTINGS
+# Enable JSON logging and success callbacks to Postgres
+# =============================================================================
+litellm_settings:
+  # Enable JSON structured logging for CloudWatch
+  json_logs: true
+
+  # Log request/response to database for auditing and usage tracking
+  success_callback: ["postgres"]
+  failure_callback: ["postgres"]
+
+  # Cache settings for improved performance
+  cache: true
+  cache_params:
+    type: "local"
+    ttl: 300  # 5 minutes
+
+  # Set reasonable timeouts
+  request_timeout: 600
+
+  # Drop unmapped params to prevent errors
+  drop_params: true
+
+  # Enable detailed logging for debugging
+  set_verbose: false
+
+# =============================================================================
+# ROUTER SETTINGS
+# Configure load balancing and fallback behavior
+# =============================================================================
+router_settings:
+  # Retry configuration
+  num_retries: 2
+  retry_after: 5
+
+  # Timeout settings (in seconds)
+  timeout: 600
+
+  # Routing strategy
+  routing_strategy: "least-busy"
+
+# =============================================================================
+# ENVIRONMENT VARIABLES REFERENCE
+# The following env vars must be set in ECS task definition:
+# - LITELLM_MASTER_KEY: Admin API key for LiteLLM
+# - DATABASE_URL: PostgreSQL connection string
+# - DATABASE_CONNECTION_POOL_LIMIT: 5 (also set in ECS for redundancy)
+# - AWS_REGION_NAME: ap-south-1
+# =============================================================================
