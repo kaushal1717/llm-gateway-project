@@ -6,24 +6,33 @@
 #
 # Each tier has:
 #   - name: Display name for the tier
-#   - budget_monthly: Maximum spend per month in USD
-#   - rpm_limit: Requests per minute limit
+#   - budget_daily: Maximum spend per day in USD (resets every 24 hours)
+#   - budget_monthly: Maximum spend per month in USD (safety cap)
 #   - allowed_models: List of model aliases this tier can access
 #   - description: Human-readable description
 #
-# Available models (defined in config/litellm_config.yaml):
-#   - model-cheap: Claude Haiku (fast, low cost)
-#   - model-balanced: Claude Sonnet (balanced performance)
-#   - model-reasoning: DeepSeek R1 (advanced reasoning)
-#   - model-reasoning-opus: Claude Opus (premium reasoning)
+# Available models:
+#   - model-cheap: Amazon Nova Micro (fast, low cost)
+#   - model-balanced: Amazon Nova Lite (balanced performance)
+#   - model-reasoning: Amazon Nova Pro (advanced reasoning)
+#
+# Token cost reference (per million tokens):
+#   - Nova Micro: Input $0.035, Output $0.14
+#   - Nova Lite: Input $0.06, Output $0.24
+#   - Nova Pro: Input $0.80, Output $3.20
+#
+# Budget Strategy:
+#   - Daily budget enforces immediate spend limits (resets every 24 hours)
+#   - Monthly budget provides safety cap in case of daily resets issues
+#   - LiteLLM tracks spend in real-time and blocks when limit reached
 # =============================================================================
 
 tiers:
   # Entry-level tier for basic tasks
   drafting:
     name: "Drafting"
+    budget_daily: 0.017     # ~$0.50/month ÷ 30 days
     budget_monthly: 0.50
-    rpm_limit: 2
     allowed_models:
       - model-cheap
     description: "Budget-friendly tier for simple drafting tasks"
@@ -31,8 +40,8 @@ tiers:
   # Mid-tier for development work
   coding:
     name: "Coding"
+    budget_daily: 0.033     # ~$1.00/month ÷ 30 days
     budget_monthly: 1.00
-    rpm_limit: 3
     allowed_models:
       - model-balanced
     description: "Balanced tier for coding assistance"
@@ -40,11 +49,10 @@ tiers:
   # Premium tier for complex work
   architect:
     name: "Architect"
+    budget_daily: 0.067     # ~$2.00/month ÷ 30 days
     budget_monthly: 2.00
-    rpm_limit: 5
     allowed_models:
       - model-reasoning
-      - model-reasoning-opus
     description: "Premium tier for architectural decisions and complex reasoning"
 
 # =============================================================================

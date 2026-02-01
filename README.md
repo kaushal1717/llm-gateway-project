@@ -55,11 +55,16 @@ A cost-efficient, secure Generative AI Gateway on AWS using LiteLLM as a proxy t
 
 ## User Governance Tiers
 
-| Tier | Budget/Month | Rate Limit | Allowed Models |
-|------|--------------|------------|----------------|
-| **Drafting** | $0.50 | 2 RPM | model-cheap (Nova Micro) |
-| **Coding** | $1.00 | 3 RPM | model-balanced (Nova Lite) |
-| **Architect** | $2.00 | 5 RPM | model-reasoning (Nova Pro) |
+| Tier | Daily Budget | Monthly Cap | Allowed Models |
+|------|--------------|-------------|----------------|
+| **Drafting** | $0.017/day | $0.50/month | model-cheap (Nova Micro) |
+| **Coding** | $0.033/day | $1.00/month | model-balanced (Nova Lite) |
+| **Architect** | $0.067/day | $2.00/month | model-reasoning (Nova Pro) |
+
+**Budget Strategy:**
+- **Daily Budget**: Hard limit that resets every 24 hours - prevents sudden cost spikes
+- **Monthly Cap**: Safety limit tracked separately - backstop protection
+- LiteLLM tracks spend in real-time and blocks requests when daily budget is exceeded
 
 ## Model Mapping
 
@@ -215,9 +220,8 @@ curl -X POST "$LITELLM_URL/team/new" \
   -d '{
     "team_alias": "drafting",
     "models": ["model-cheap"],
-    "max_budget": 0.5,
-    "rpm_limit": 2,
-    "budget_duration": "1mo"
+    "max_budget": 0.017,
+    "budget_duration": "1d"
   }'
 
 # Create Coding team
@@ -227,9 +231,8 @@ curl -X POST "$LITELLM_URL/team/new" \
   -d '{
     "team_alias": "coding",
     "models": ["model-balanced"],
-    "max_budget": 1.0,
-    "rpm_limit": 3,
-    "budget_duration": "1mo"
+    "max_budget": 0.033,
+    "budget_duration": "1d"
   }'
 
 # Create Architect team
@@ -239,9 +242,8 @@ curl -X POST "$LITELLM_URL/team/new" \
   -d '{
     "team_alias": "architect",
     "models": ["model-reasoning"],
-    "max_budget": 2.0,
-    "rpm_limit": 5,
-    "budget_duration": "1mo"
+    "max_budget": 0.067,
+    "budget_duration": "1d"
   }'
 ```
 
@@ -274,6 +276,40 @@ curl -X POST "$LITELLM_URL/key/generate" \
     "key_alias": "User Name"
   }'
 ```
+
+---
+
+## Accessing the LiteLLM UI
+
+The LiteLLM Admin UI is enabled and accessible via your ALB URL.
+
+### UI Access
+
+```bash
+# Open in browser
+http://llm-gateway-dev-alb-XXXXXXXXX.ap-south-1.elb.amazonaws.com/ui
+```
+
+**Authentication:**
+- **Username:** `admin`
+- **Password:** `admin123`
+- Once logged in, use your Master Key for API operations
+
+**The UI provides:**
+- Visual interface to view and manage models
+- Monitor API keys and teams
+- Track usage and spending in real-time
+- View logs and metrics
+- Test API endpoints directly
+
+### Swagger/OpenAPI Docs
+
+```bash
+# API documentation
+http://llm-gateway-dev-alb-XXXXXXXXX.ap-south-1.elb.amazonaws.com/
+```
+
+The root URL provides interactive API documentation powered by Swagger UI.
 
 ---
 
@@ -417,22 +453,22 @@ After rebuilding, you'll need to:
 tiers:
   drafting:
     name: "Drafting"
+    budget_daily: 0.017     # ~$0.50/month ÷ 30 days
     budget_monthly: 0.50
-    rpm_limit: 2
     allowed_models:
       - model-cheap
 
   coding:
     name: "Coding"
+    budget_daily: 0.033     # ~$1.00/month ÷ 30 days
     budget_monthly: 1.00
-    rpm_limit: 3
     allowed_models:
       - model-balanced
 
   architect:
     name: "Architect"
+    budget_daily: 0.067     # ~$2.00/month ÷ 30 days
     budget_monthly: 2.00
-    rpm_limit: 5
     allowed_models:
       - model-reasoning
 ```

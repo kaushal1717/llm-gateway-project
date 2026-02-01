@@ -187,6 +187,18 @@ resource "aws_ecs_task_definition" "main" {
         {
           name  = "LITELLM_MODE"
           value = "PRODUCTION"
+        },
+        {
+          name  = "ENABLE_ADMIN_UI"
+          value = "True"
+        },
+        {
+          name  = "UI_USERNAME"
+          value = "admin"
+        },
+        {
+          name  = "UI_PASSWORD"
+          value = "admin123"
         }
       ]
 
