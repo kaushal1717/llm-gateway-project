@@ -57,7 +57,7 @@ general_settings:
 # Enable JSON logging and success callbacks to Postgres
 # =============================================================================
 litellm_settings:
-  # Enable JSON structured logging for CloudWatch
+  # Enable JSON structured logging for CloudWatcharn:aws:bedrock:*::foundation-model/anthropic.*
   json_logs: true
 
   # Log request/response to database for auditing and usage tracking

@@ -115,14 +115,9 @@ resource "aws_iam_role_policy" "ecs_bedrock" {
         ]
         Resource = [
           # Foundation models
-          "arn:aws:bedrock:*::foundation-model/anthropic.*",
-          "arn:aws:bedrock:*::foundation-model/amazon.*",
-          "arn:aws:bedrock:*::foundation-model/us.anthropic.*",
-          "arn:aws:bedrock:*::foundation-model/us.deepseek.*",
-          # Cross-region inference profiles (APAC)
-          "arn:aws:bedrock:*:${data.aws_caller_identity.current.account_id}:inference-profile/apac.*",
-          # US inference profiles (if needed later)
-          "arn:aws:bedrock:*:${data.aws_caller_identity.current.account_id}:inference-profile/us.*"
+          "arn:aws:bedrock:*::foundation-model/*",
+          "arn:aws:bedrock:*:*:provisioned-model/*",
+          "arn:aws:bedrock:*:*:inference-profile/*",
         ]
       }
     ]
